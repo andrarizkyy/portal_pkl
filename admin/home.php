@@ -11,10 +11,23 @@ if ($kelas)   $where[] = "kelas='$kelas'";
 $where_sql = $where ? "WHERE ".implode(" AND ", $where) : "";
 
 /* ================== QUERY ================== */
-$jml_perusahaan = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) total FROM perusahaan"));
-$jml_siswa = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) total FROM siswa"));
-$data_siswa = mysqli_query($conn,"SELECT * FROM siswa $where_sql ORDER BY nama");
-$data_perusahaan = mysqli_query($conn,"SELECT * FROM perusahaan ORDER BY nama_perusahaan");
+// Hitung jumlah DUDI
+$jml_perusahaan_query = mysqli_query($conn,"SELECT COUNT(*) total FROM dudi");
+if(!$jml_perusahaan_query) die("Query DUDI Error: ".mysqli_error($conn));
+$jml_perusahaan = mysqli_fetch_assoc($jml_perusahaan_query);
+
+// Hitung jumlah siswa
+$jml_siswa_query = mysqli_query($conn,"SELECT COUNT(*) total FROM siswa");
+if(!$jml_siswa_query) die("Query Siswa Error: ".mysqli_error($conn));
+$jml_siswa = mysqli_fetch_assoc($jml_siswa_query);
+
+// Ambil data siswa
+$data_siswa = mysqli_query($conn,"SELECT * FROM siswa $where_sql ORDER BY nama_siswa");
+if(!$data_siswa) die("Query Data Siswa Error: ".mysqli_error($conn));
+
+// Ambil data DUDI
+$data_perusahaan = mysqli_query($conn,"SELECT * FROM dudi ORDER BY nama_dudi");
+if(!$data_perusahaan) die("Query Data DUDI Error: ".mysqli_error($conn));
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -70,10 +83,10 @@ function updateKelas(){
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-    <h4 class="text-center py-4 border-bottom">PKL Hub</h4>
+    <h4 class="text-center py-4 border-bottom">Portal PKL</h4>
     <a class="active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-    <a href="#perusahaan"><i class="bi bi-building me-2"></i> Data Perusahaan</a>
-    <a href="#siswa"><i class="bi bi-people me-2"></i> Monitoring Siswa PKL</a>
+    <a href="dudi.php"><i class="bi bi-building me-2"></i> Data Perusahaan</a>
+    <a href="siswa.php"><i class="bi bi-people me-2"></i> Monitoring Siswa PKL</a>
 </div>
 
 <div class="content">
@@ -103,29 +116,40 @@ function updateKelas(){
     </div>
 </div>
 
-<!-- DATA PERUSAHAAN -->
+<!-- DATA DUDI -->
 <div class="card shadow-sm border-0 mb-4" id="perusahaan">
 <div class="card-header bg-white">
-    <h5>Data Perusahaan</h5>
+    <h5>Data DUDI</h5>
 </div>
 <div class="card-body table-responsive">
 <table class="table table-striped table-bordered">
 <thead class="table-light">
 <tr>
-    <th>Nama</th>
+    <th>Nama DUDI</th>
     <th>Bidang</th>
     <th>Email</th>
-    <th>No HP</th>
+    <th>Jumlah Anak</th>
+    <th>Detail</th>
 </tr>
 </thead>
 <tbody>
-<?php while($p=mysqli_fetch_assoc($data_perusahaan)){ ?>
+<?php while($p=mysqli_fetch_assoc($data_perusahaan)){ 
+    // Hitung jumlah siswa di DUDI ini
+    $count_siswa_query = mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa WHERE nama_dudi='{$p['nama_dudi']}'");
+    $count_siswa = mysqli_fetch_assoc($count_siswa_query)['total'];
+?>
 <tr>
-    <td><?= $p['nama_perusahaan']; ?></td>
+    <td><?= $p['nama_dudi']; ?></td>
     <td><?= $p['bidang_usaha']; ?></td>
     <td><?= $p['email']; ?></td>
-    <td><?= $p['no_hp']; ?></td>
+    <td><?= $count_siswa; ?></td>
+    <td>
+        <a href="dudi.php?id_dudi=<?= $p['id_dudi']; ?>" class="btn btn-sm btn-outline-danger mt-1">
+            <i class="bi bi-people"></i> Lihat Siswa
+        </a>
+    </td>
 </tr>
+
 <?php } ?>
 </tbody>
 </table>
@@ -161,10 +185,10 @@ function updateKelas(){
 
 <?php while($s=mysqli_fetch_assoc($data_siswa)){ ?>
 <div class="d-flex align-items-center border-bottom py-3">
-    <img src="https://ui-avatars.com/api/?name=<?= urlencode($s['nama']); ?>&background=c62828&color=fff"
+    <img src="https://ui-avatars.com/api/?name=<?= urlencode($s['nama_siswa']); ?>&background=c62828&color=fff"
          class="rounded-circle me-3" width="45">
     <div class="flex-grow-1">
-        <strong><?= $s['nama']; ?></strong><br>
+        <strong><?= $s['nama_siswa']; ?></strong><br>
         <small><?= $s['jurusan']; ?> • <?= $s['kelas']; ?></small>
     </div>
 </div>
