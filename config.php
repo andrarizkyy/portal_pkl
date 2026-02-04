@@ -1,8 +1,9 @@
 <?php
 $host = "localhost";
-$user = "root";        
-$password = "";            
-$db   = "portal_pkl";
+$user = "pkl_user";   
+$password = "pkl123";    
+$db = "portal_pkl";      
+
 $conn = mysqli_connect($host, $user, $password, $db);
 
 if (!$conn) {
