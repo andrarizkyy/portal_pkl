@@ -1,0 +1,189 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #f4f7fb;
+  color: #333;
+}
+
+/* NAVBAR */
+.navbar {
+  background: white;
+  padding: 14px 30px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.logo {
+  color: #2d7d46;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+.nav-menu li {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.user {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* MAIN */
+.container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* HERO */
+.hero {
+  background-image: url(banner.png);
+  padding: 30px;
+  border-radius: 14px;
+  margin-bottom: 30px;
+}
+
+.hero-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 14px auto 30px;
+  max-width: 1200px;
+}
+
+.hero h1 {
+  font-size: 22px;
+}
+
+.hero p {
+  font-size: 14px;
+  margin: 6px 0 20px;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.search-box button {
+  background: #2d7d46;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.category span {
+  display: inline-block;
+  background: #e8f3ec;
+  color: #2d7d46;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+/* CONTENT */
+.content {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 20px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 14px 0 30px;
+}
+
+.job-card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+}
+
+.job-card h4 {
+  font-size: 15px;
+}
+
+.job-card p {
+  font-size: 13px;
+  color: #666;
+  margin: 6px 0 12px;
+}
+
+.job-card button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* TABLE */
+.table {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr;
+  padding: 10px 0;
+  font-size: 13px;
+}
+
+.row.head {
+  font-weight: bold;
+  border-bottom: 1px solid #eee;
+}
+
+.accepted {
+  color: #16a34a;
+}
+
+.pending {
+  color: #f59e0b;
+}
+
+.rejected {
+  color: #dc2626;
+}
+
+/* SIDE */
+.side-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 14px;
+}
