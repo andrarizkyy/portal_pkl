@@ -13,26 +13,23 @@
   <div class="nav-left">
     <h2 class="logo">PKL Hub</h2>
     <ul class="nav-menu">
-      <li>Dashboard</li>
-      <li>Cari Tempat PKL</li>
-      <li>Status Lamaran</li>
-      <li>Riwayat PKL</li>
+      <li><a href="index.php">Dashboard</a></li>
+      <li><a href="caritempat.php">Cari Tempat PKL</a></li>
+      <li><a href="status.php">Status Lamaran</a></li>
     </ul>
   </div>
   <div class="nav-right">
-    <span class="user">Budi Santoso ⌄</span>
+    <span class="user">Budi Santoso</span>
   </div>
 </nav>
 
 <!-- MAIN -->
-<main class="container">
+<main class="wrapper">
+
 
   <!-- HERO -->
   <section class="hero">
-    <h1>Halo, <b>Budi Santoso</b> 👋</h1>
-    <p>Yuk, cari & lamar tempat PKL terbaik untukmu!</p>
-
-    <div class="hero-cards">
+    <h1>Yuk, cari & lamar tempat PKL terbaik untukmu!</h1>
 
     <div class="search-box">
       <input type="text" placeholder="Cari posisi / perusahaan...">
@@ -40,12 +37,11 @@
     </div>
 
     <div class="category">
-      <span>IT & Software</span>
-      <span>Bisnis</span>
-      <span>Teknik</span>
-      <span>Kesehatan</span>
-      <span>Akuntansi</span>
-    </div>
+      <span><button>IT & Software</button></span>
+      <span><button>Bisnis</button></span>
+      <span><button>Teknik</button></span>
+      <span><button>Kesehatan</button></span>
+      <span><button>Akuntansi</button></span>
     </div>
   </section>
 
@@ -54,11 +50,9 @@
 
     <!-- LEFT -->
     <div class="left">
-
       <h3>Rekomendasi IT & Software</h3>
 
       <div class="cards">
-
         <div class="job-card">
           <h4>SunTech Corp</h4>
           <p>Programmer Intern • Jakarta</p>
@@ -76,11 +70,13 @@
           <p>IT Support • Bogor</p>
           <button>Lamar</button>
         </div>
-
       </div>
+    </div>
 
-      <!-- STATUS -->
+    <!-- RIGHT -->
+    <div class="right">
       <h3>Status Lamaran</h3>
+
       <div class="table">
         <div class="row head">
           <span>Perusahaan</span>
@@ -104,22 +100,6 @@
           <span>Inti Data Solutions</span>
           <span>Web Designer</span>
           <span class="rejected">Ditolak</span>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- RIGHT -->
-    <div class="right">
-      <div class="side-card">
-        <h4>Riwayat PKL</h4>
-        <p>Belum ada riwayat PKL</p>
-      </div>
-    </div>
-
-  </section>
-
-</main>
-
+          </div>
 </body>
 </html>
