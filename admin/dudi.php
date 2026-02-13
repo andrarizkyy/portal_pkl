@@ -1,98 +1,312 @@
 <?php
 include "../config.php";
 
-// Cek apakah id_dudi dikirim
-$id_dudi = $_GET['id_dudi'] ?? '';
-if (!$id_dudi) {
-    die("DUDI tidak ditemukan!");
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit;
 }
 
-// Ambil info DUDI
-$dudi_query = mysqli_query($conn, "SELECT * FROM dudi WHERE id_dudi='$id_dudi'");
-if (!$dudi_query || mysqli_num_rows($dudi_query)==0) {
-    die("DUDI tidak ditemukan!");
-}
-$dudi = mysqli_fetch_assoc($dudi_query);
+/* ================== DATA DUDI (TIDAK DIUBAH) ================== */
+$data_dudi = mysqli_query($conn,"
+    SELECT
+        d.*,
+        COUNT(s.nis) AS jumlah_siswa
+    FROM dudi d
+    LEFT JOIN siswa s ON d.id_dudi = s.id_dudi
+    GROUP BY d.id_dudi
+    ORDER BY d.nama_dudi
+");
 
-// Ambil semua siswa yang PKL di DUDI ini
-$siswa_query = mysqli_query($conn, "SELECT * FROM siswa WHERE nama_dudi='{$dudi['nama_dudi']}' ORDER BY nama_siswa");
-if (!$siswa_query) die("Query Siswa Error: ".mysqli_error($conn));
+$total_dudi = mysqli_num_rows($data_dudi);
 ?>
+
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Siswa PKL di <?= $dudi['nama_dudi']; ?></title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<title>Data DUDI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-body { background:#f6f7fb; }
+
+/* ================= GLOBAL ================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+body{
+    display:flex;
+    background:#f3f4f6;
+}
+
+/* ================= SIDEBAR (SAMA PERSIS) ================= */
+
 .sidebar{
-    width:260px; min-height:100vh;
-    background:linear-gradient(180deg,#c62828,#b71c1c);
-    position:fixed; color:#fff;
+    width:260px;
+    background:white;
+    min-height:100vh;
+    padding:30px 20px;
+    border-right:1px solid #e5e7eb;
 }
+
+.sidebar h2{
+    color:#8b5cf6;
+    margin-bottom:40px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
 .sidebar a{
-    color:#fff; text-decoration:none;
-    padding:14px 18px; display:block;
-    margin:5px 12px; border-radius:10px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 15px;
+    text-decoration:none;
+    color:#374151;
+    margin-bottom:8px;
+    border-radius:8px;
+    transition:0.2s;
+    font-size:14px;
 }
-.sidebar a.active,.sidebar a:hover{
-    background:rgba(255,255,255,.2);
+
+.sidebar a i{
+    width:18px;
 }
-.content{ margin-left:260px; padding:25px; }
+
+.sidebar a:hover{
+    background:#f3f4f6;
+    color:#8b5cf6;
+}
+
+.sidebar a.active{
+    background:#ede9fe;
+    color:#6d28d9;
+    font-weight:600;
+    position:relative;
+}
+
+.sidebar a.active::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:4px;
+    background:#8b5cf6;
+    border-radius:4px 0 0 4px;
+}
+
+/* ================= MAIN ================= */
+
+.main{
+    flex:1;
+}
+
+/* ================= TOPBAR (SAMA PERSIS) ================= */
+
+.topbar{
+    height:70px;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    padding:0 30px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.profile{
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+/* ================= CONTENT ================= */
+
+.content{
+    padding:30px;
+}
+
+/* ================= CARDS (SAMA PERSIS) ================= */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    margin-bottom:40px;
+}
+
+.card{
+    padding:30px;
+    color:white;
+    position:relative;
+    overflow:hidden;
+    border-radius:14px;
+}
+
+.card h3{
+    font-weight:400;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.card p{
+    font-size:30px;
+    font-weight:600;
+}
+
+.card::after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    background:rgba(255,255,255,0.15);
+    border-radius:50%;
+    top:-40px;
+    right:-40px;
+}
+
+.card.dudi{
+    background:linear-gradient(135deg,#60a5fa,#3b82f6);
+}
+
+/* ================= SECTION (SAMA PERSIS) ================= */
+
+.section{
+    background:white;
+    padding:25px;
+    margin-bottom:30px;
+    border-radius:14px;
+    border:1px solid #e5e7eb;
+}
+
+.section h3{
+    margin-bottom:20px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td{
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:left;
+    font-size:14px;
+}
+
+thead{
+    background:#f9fafb;
+}
+
+tr:hover{
+    background:#f3f4f6;
+}
+
+/* BUTTON (SAMA PERSIS) */
+
+.btn{
+    display:inline-block;
+    margin-top:15px;
+    padding:8px 16px;
+    background:#1877F2;
+    color:white;
+    text-decoration:none;
+    font-size:14px;
+    border-radius:6px;
+}
+
+.btn:hover{
+    background:#0f5dc2;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="sidebar">
-    <h4 class="text-center py-4 border-bottom">PKL Hub</h4>
-    <a href="home.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-    <a href="perusahaan.php"><i class="bi bi-building me-2"></i> Data Perusahaan</a>
-    <a class="active" href="#"><i class="bi bi-people me-2"></i> Siswa PKL</a>
+    <h2><i class="fa-solid fa-graduation-cap"></i> Portal PKL</h2>
+
+    <a href="home.php">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+
+    <a href="siswa.php">
+        <i class="fa-solid fa-user-graduate"></i> Data Siswa
+    </a>
+
+    <a href="dudi.php" class="active">
+        <i class="fa-solid fa-building"></i> Data DUDI
+    </a>
 </div>
 
-<div class="content">
-<h3>Siswa PKL di <?= $dudi['nama_dudi']; ?></h3>
-<div class="mb-3">
-    <a href="home.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>
+<div class="main">
+
+    <div class="topbar">
+        <div class="profile">
+            <i class="fa-solid fa-user-shield"></i> Admin
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- CARD TOTAL -->
+        <div class="cards">
+            <div class="card dudi">
+                <h3><i class="fa-solid fa-building"></i> Total DUDI</h3>
+                <p><?= $total_dudi ?></p>
+            </div>
+        </div>
+
+        <!-- DATA DUDI -->
+        <div class="section">
+            <h3><i class="fa-solid fa-briefcase"></i> Data Dunia Usaha & Dunia Industri</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama DUDI</th>
+                        <th>Bidang Usaha</th>
+                        <th>Jumlah Siswa PKL</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php mysqli_data_seek($data_dudi, 0); ?>
+                    <?php while($d=mysqli_fetch_assoc($data_dudi)): ?>
+                    <tr>
+                        <td><?= $d['nama_dudi']; ?></td>
+                        <td><?= $d['bidang_usaha']; ?></td>
+                        <td><?= $d['jumlah_siswa']; ?></td>
+                        <td>
+                            <a href="detail_dudi.php?id_dudi=<?= $d['id_dudi']; ?>" class="btn">
+                                Detail
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
 
-<?php if(mysqli_num_rows($siswa_query)>0){ ?>
-<table class="table table-striped table-bordered">
-<thead>
-<tr>
-    <th>NIS</th>
-    <th>Nama Siswa</th>
-    <th>Kelas</th>
-    <th>Jurusan</th>
-    <th>Alamat</th>
-    <th>Jenis Kelamin</th>
-    <th>Agama</th>
-    <th>TTL</th>
-    <th>No HP</th>
-</tr>
-</thead>
-<tbody>
-<?php while($s=mysqli_fetch_assoc($siswa_query)){ ?>
-<tr>
-    <td><?= $s['nis']; ?></td>
-    <td><?= $s['nama_siswa']; ?></td>
-    <td><?= $s['kelas']; ?></td>
-    <td><?= $s['jurusan']; ?></td>
-    <td><?= $s['alamat']; ?></td>
-    <td><?= $s['jenis_kelamin']; ?></td>
-    <td><?= $s['agama']; ?></td>
-    <td><?= $s['TTL']; ?></td>
-    <td><?= $s['no_hp']; ?></td>
-</tr>
-<?php } ?>
-</tbody>
-</table>
-<?php } else { ?>
-<p>Tidak ada siswa PKL di DUDI ini.</p>
-<?php } ?>
-
-</div>
 </body>
 </html>

@@ -1,202 +1,249 @@
 <?php
 include "../config.php";
+session_start();
 
-/* ================== FILTER SISWA ================== */
-$jurusan = $_GET['jurusan'] ?? '';
-$kelas   = $_GET['kelas'] ?? '';
-
-$where = [];
-if ($jurusan) $where[] = "jurusan='$jurusan'";
-if ($kelas)   $where[] = "kelas='$kelas'";
-$where_sql = $where ? "WHERE ".implode(" AND ", $where) : "";
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit;
+}
 
 /* ================== QUERY ================== */
-// Hitung jumlah DUDI
-$jml_perusahaan_query = mysqli_query($conn,"SELECT COUNT(*) total FROM dudi");
-if(!$jml_perusahaan_query) die("Query DUDI Error: ".mysqli_error($conn));
-$jml_perusahaan = mysqli_fetch_assoc($jml_perusahaan_query);
 
-// Hitung jumlah siswa
-$jml_siswa_query = mysqli_query($conn,"SELECT COUNT(*) total FROM siswa");
-if(!$jml_siswa_query) die("Query Siswa Error: ".mysqli_error($conn));
-$jml_siswa = mysqli_fetch_assoc($jml_siswa_query);
+$total_siswa   = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) as t FROM siswa"))['t'];
+$total_dudi    = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) as t FROM dudi"))['t'];
+$total_jurusan = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) as t FROM jurusan"))['t'];
 
-// Ambil data siswa
-$data_siswa = mysqli_query($conn,"SELECT * FROM siswa $where_sql ORDER BY nama_siswa");
-if(!$data_siswa) die("Query Data Siswa Error: ".mysqli_error($conn));
+/* ===== DATA DUDI + JUMLAH SISWA (MAX 3) ===== */
+$data_dudi = mysqli_query($conn,"
+    SELECT
+        d.id_dudi,
+        d.nama_dudi,
+        d.bidang_usaha,
+        COUNT(s.nis) AS jumlah_siswa
+    FROM dudi d
+    LEFT JOIN siswa s ON d.id_dudi = s.id_dudi
+    GROUP BY d.id_dudi
+    ORDER BY d.nama_dudi
+    LIMIT 3
+");
 
-// Ambil data DUDI
-$data_perusahaan = mysqli_query($conn,"SELECT * FROM dudi ORDER BY nama_dudi");
-if(!$data_perusahaan) die("Query Data DUDI Error: ".mysqli_error($conn));
+/* ===== DATA SISWA + NIS + DUDI (MAX 3) ===== */
+$data_siswa = mysqli_query($conn,"
+    SELECT 
+        s.nis,
+        s.nama_siswa,
+        k.nama_kelas,
+        d.nama_dudi
+    FROM siswa s
+    LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
+    LEFT JOIN dudi d ON s.id_dudi = d.id_dudi
+    ORDER BY s.nama_siswa
+    LIMIT 3
+");
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<title>Dashboard Admin Sekolah</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body { background:#f6f7fb; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins', sans-serif;}
+body{display:flex;background:#f3f4f6;}
+
 .sidebar{
-    width:260px; min-height:100vh;
-    background:linear-gradient(180deg,#c62828,#b71c1c);
-    position:fixed; color:#fff;
+    width:260px;background:white;min-height:100vh;
+    padding:30px 20px;border-right:1px solid #e5e7eb;
+}
+.sidebar h2{
+    color:#8b5cf6;margin-bottom:40px;
+    display:flex;align-items:center;gap:10px;
 }
 .sidebar a{
-    color:#fff; text-decoration:none;
-    padding:14px 18px; display:block;
-    margin:5px 12px; border-radius:10px;
+    display:flex;align-items:center;gap:12px;
+    padding:12px 15px;text-decoration:none;
+    color:#374151;margin-bottom:8px;
+    border-radius:8px;transition:0.2s;font-size:14px;
 }
-.sidebar a.active,.sidebar a:hover{
-    background:rgba(255,255,255,.2);
+.sidebar a i{width:18px;}
+.sidebar a:hover{background:#f3f4f6;color:#8b5cf6;}
+.sidebar a.active{
+    background:#ede9fe;color:#6d28d9;font-weight:600;position:relative;
 }
-.content{ margin-left:260px; padding:25px; }
-.card-stat{ border:0; border-radius:16px; color:#fff; }
-</style>
+.sidebar a.active::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;
+    width:4px;background:#8b5cf6;border-radius:4px 0 0 4px;
+}
 
-<script>
-const kelasMap = {
-    "AKL":["AKL 1","AKL 2","AKL 3","AKL 4"],
-    "PM":["PM 1","PM 2","PM 3"],
-    "MP":["MP 1","MP 2","MP 3"],
-    "BP":["BP 1","BP 2"],
-    "TJKT":["TJKT 1","TJKT 2","TJKT 3","TJKT 4"],
-    "RPL":["RPL 1","RPL 2"]
-};
-function updateKelas(){
-    let j = document.getElementById("jurusan").value;
-    let k = document.getElementById("kelas");
-    k.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-    if(kelasMap[j]){
-        kelasMap[j].forEach(v=>{
-            k.innerHTML += `<option value="${v}">${v}</option>`;
-        });
-    }
+.main{flex:1;}
+
+.topbar{
+    height:70px;background:white;
+    display:flex;align-items:center;justify-content:flex-end;
+    padding:0 30px;border-bottom:1px solid #e5e7eb;
 }
-</script>
+.profile{font-weight:600;display:flex;align-items:center;gap:8px;}
+
+.content{padding:30px;}
+
+.cards{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;margin-bottom:40px;
+}
+.card{
+    padding:30px;color:white;position:relative;
+    overflow:hidden;border-radius:14px;
+}
+.card h3{
+    font-weight:400;margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+}
+.card p{font-size:30px;font-weight:600;}
+.card::after{
+    content:"";position:absolute;width:180px;height:180px;
+    background:rgba(255,255,255,0.15);
+    border-radius:50%;top:-40px;right:-40px;
+}
+.card.siswa{background:linear-gradient(135deg,#ff9a9e,#f472b6);}
+.card.dudi{background:linear-gradient(135deg,#60a5fa,#3b82f6);}
+.card.jurusan{background:linear-gradient(135deg,#34d399,#10b981);}
+
+.section{
+    background:white;padding:25px;margin-bottom:30px;
+    border-radius:14px;border:1px solid #e5e7eb;
+}
+.section h3{
+    margin-bottom:20px;display:flex;
+    align-items:center;gap:8px;
+}
+table{width:100%;border-collapse:collapse;}
+th,td{
+    padding:12px;border-bottom:1px solid #e5e7eb;
+    text-align:left;font-size:14px;
+}
+thead{background:#f9fafb;}
+tr:hover{background:#f3f4f6;}
+
+.btn{
+    display:inline-block;padding:6px 12px;
+    background:#1877F2;color:white;
+    text-decoration:none;font-size:13px;
+    border-radius:6px;
+}
+.btn:hover{background:#0f5dc2;}
+</style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
-    <h4 class="text-center py-4 border-bottom">Portal PKL</h4>
-    <a class="active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-    <a href="dudi.php"><i class="bi bi-building me-2"></i> Data Perusahaan</a>
-    <a href="siswa.php"><i class="bi bi-people me-2"></i> Monitoring Siswa PKL</a>
+    <h2><i class="fa-solid fa-graduation-cap"></i> Portal PKL</h2>
+
+    <a href="home.php" class="active">
+        <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+    <a href="siswa.php">
+        <i class="fa-solid fa-user-graduate"></i> Data Siswa
+    </a>
+    <a href="dudi.php">
+        <i class="fa-solid fa-building"></i> Data DUDI
+    </a>
+</div>
+
+<div class="main">
+
+<div class="topbar">
+    <div class="profile">
+        <i class="fa-solid fa-user-shield"></i> Admin
+    </div>
 </div>
 
 <div class="content">
 
-<!-- TOP -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3>Dashboard Admin Sekolah</h3>
-    <div>
-        <i class="bi bi-bell fs-4 me-3"></i>
-        <i class="bi bi-person-circle fs-4"></i>
+<div class="cards">
+    <div class="card siswa">
+        <h3><i class="fa-solid fa-users"></i> Total Siswa</h3>
+        <p><?= $total_siswa ?></p>
     </div>
-</div>
 
-<!-- STAT -->
-<div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <div class="card card-stat bg-danger p-3">
-            <small>Perusahaan</small>
-            <h2><?= $jml_perusahaan['total']; ?></h2>
-        </div>
+    <div class="card dudi">
+        <h3><i class="fa-solid fa-building"></i> Total DUDI</h3>
+        <p><?= $total_dudi ?></p>
     </div>
-    <div class="col-md-6">
-        <div class="card card-stat bg-success p-3">
-            <small>Siswa PKL</small>
-            <h2><?= $jml_siswa['total']; ?></h2>
-        </div>
+
+    <div class="card jurusan">
+        <h3><i class="fa-solid fa-layer-group"></i> Total Jurusan</h3>
+        <p><?= $total_jurusan ?></p>
     </div>
 </div>
 
 <!-- DATA DUDI -->
-<div class="card shadow-sm border-0 mb-4" id="perusahaan">
-<div class="card-header bg-white">
-    <h5>Data DUDI</h5>
-</div>
-<div class="card-body table-responsive">
-<table class="table table-striped table-bordered">
-<thead class="table-light">
-<tr>
-    <th>Nama DUDI</th>
-    <th>Bidang</th>
-    <th>Email</th>
-    <th>Jumlah Anak</th>
-    <th>Detail</th>
-</tr>
-</thead>
-<tbody>
-<?php while($p=mysqli_fetch_assoc($data_perusahaan)){ 
-    // Hitung jumlah siswa di DUDI ini
-    $count_siswa_query = mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa WHERE nama_dudi='{$p['nama_dudi']}'");
-    $count_siswa = mysqli_fetch_assoc($count_siswa_query)['total'];
-?>
-<tr>
-    <td><?= $p['nama_dudi']; ?></td>
-    <td><?= $p['bidang_usaha']; ?></td>
-    <td><?= $p['email']; ?></td>
-    <td><?= $count_siswa; ?></td>
-    <td>
-        <a href="dudi.php?id_dudi=<?= $p['id_dudi']; ?>" class="btn btn-sm btn-outline-danger mt-1">
-            <i class="bi bi-people"></i> Lihat Siswa
-        </a>
-    </td>
-</tr>
-
-<?php } ?>
-</tbody>
-</table>
-</div>
+<div class="section">
+    <h3><i class="fa-solid fa-briefcase"></i> Data DUDI</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nama DUDI</th>
+                <th>Bidang Usaha</th>
+                <th>Jumlah Siswa PKL</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while($d = mysqli_fetch_assoc($data_dudi)): ?>
+            <tr>
+                <td><?= $d['nama_dudi'] ?></td>
+                <td><?= $d['bidang_usaha'] ?></td>
+                <td><?= $d['jumlah_siswa'] ?></td>
+                <td>
+                    <a href="detail_dudi.php?id_dudi=<?= $d['id_dudi'] ?>" class="btn">
+                        Detail
+                    </a>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+    <a href="dudi.php" class="btn" style="margin-top:15px;">Lihat Semua</a>
 </div>
 
-<!-- MONITORING SISWA -->
-<div class="card shadow-sm border-0 mb-4" id="siswa">
-<div class="card-header bg-white">
-    <h5>Monitoring Siswa PKL</h5>
+<!-- DATA SISWA -->
+<div class="section">
+    <h3><i class="fa-solid fa-user-graduate"></i> Data Siswa</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>NIS</th>
+                <th>Nama</th>
+                <th>Kelas</th>
+                <th>DUDI</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while($s = mysqli_fetch_assoc($data_siswa)): ?>
+            <tr>
+                <td><?= $s['nis'] ?></td>
+                <td><?= $s['nama_siswa'] ?></td>
+                <td><?= $s['nama_kelas'] ?? '-' ?></td>
+                <td><?= $s['nama_dudi'] ?? '-' ?></td>
+                <td>
+                    <a href="detail_siswa.php?nis=<?= $s['nis'] ?>" class="btn">
+                        Detail
+                    </a>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+    <a href="siswa.php" class="btn" style="margin-top:15px;">Lihat Semua</a>
 </div>
-<div class="card-body">
-
-<form class="row g-3 mb-3">
-<div class="col-md-4">
-    <select name="jurusan" id="jurusan" class="form-select" onchange="updateKelas()">
-        <option value="">-- Pilih Jurusan --</option>
-        <?php foreach(["AKL","PM","MP","BP","TJKT","RPL"] as $j){
-            echo "<option ".($jurusan==$j?'selected':'').">$j</option>";
-        } ?>
-    </select>
-</div>
-<div class="col-md-4">
-    <select name="kelas" id="kelas" class="form-select">
-        <option value="">-- Pilih Kelas --</option>
-    </select>
-</div>
-<div class="col-md-4">
-    <button class="btn btn-danger">Tampilkan</button>
-    <a href="home.php" class="btn btn-secondary">Reset</a>
-</div>
-</form>
-
-<?php while($s=mysqli_fetch_assoc($data_siswa)){ ?>
-<div class="d-flex align-items-center border-bottom py-3">
-    <img src="https://ui-avatars.com/api/?name=<?= urlencode($s['nama_siswa']); ?>&background=c62828&color=fff"
-         class="rounded-circle me-3" width="45">
-    <div class="flex-grow-1">
-        <strong><?= $s['nama_siswa']; ?></strong><br>
-        <small><?= $s['jurusan']; ?> • <?= $s['kelas']; ?></small>
-    </div>
-</div>
-<?php } ?>
 
 </div>
 </div>
 
-</div>
 </body>
 </html>
