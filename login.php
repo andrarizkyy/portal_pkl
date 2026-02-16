@@ -12,7 +12,7 @@ if (isset($_POST['login'])) {
     if ($username === 'admin' && $password === 'admin123') {
         $_SESSION['role'] = 'admin';
         $_SESSION['username'] = 'admin';
-        header("Location: admin/home.php");
+        header("Location: admin/index.php");
         exit;
     }
 
@@ -24,7 +24,7 @@ if (isset($_POST['login'])) {
             $_SESSION['role'] = 'siswa';
             $_SESSION['nis']  = $s['nis'];
             $_SESSION['nama'] = $s['nama_siswa'];
-            header("Location: siswa/dashboard.php");
+            header("Location: user/index.php");
             exit;
         }
 
@@ -128,10 +128,6 @@ small.hint{
     </form>
 
     <div class="text-center mt-3">
-        <small class="hint">
-            Siswa & DUDI: <b>12345678</b><br>
-            Admin: <b>admin123</b>
-        </small>
     </div>
 </div>
 

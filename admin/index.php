@@ -142,7 +142,7 @@ tr:hover{background:#f3f4f6;}
 <div class="sidebar">
     <h2><i class="fa-solid fa-graduation-cap"></i> Portal PKL</h2>
 
-    <a href="home.php" class="active">
+    <a href="index.php" class="active">
         <i class="fa-solid fa-house"></i> Dashboard
     </a>
     <a href="siswa.php">

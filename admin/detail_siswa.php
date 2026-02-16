@@ -153,7 +153,7 @@ body{display:flex;background:#f3f4f6;}
 <div class="sidebar">
     <h2><i class="fa-solid fa-graduation-cap"></i> Portal PKL</h2>
 
-    <a href="home.php">
+    <a href="index.php">
         <i class="fa-solid fa-house"></i> Dashboard
     </a>
 
