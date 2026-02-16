@@ -1,3 +1,14 @@
+<?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'siswa') {
+    header("Location: ../login.php");
+    exit;
+}
+
+// Ambil nama siswa dari session
+$nama_siswa = $_SESSION['username']; // bisa diganti $_SESSION['nis'] atau nama lengkap dari DB
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
