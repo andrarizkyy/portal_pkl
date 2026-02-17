@@ -1,12 +1,12 @@
 <?php
 $host = "localhost";
-$user = "pkl_user";   
-$password = "pkl123";    
-$db = "portal_pkl";      
+$user = "root";
+$pass = ""; // kosong
+$db   = "portal_pkl";
 
-$conn = mysqli_connect($host, $user, $password, $db);
+$conn = mysqli_connect($host, $user, $pass, $db);
 
 if (!$conn) {
-    die("Koneksi database gagal: " . mysqli_connect_error());
+    die("Koneksi gagal: " . mysqli_connect_error());
 }
 ?>
