@@ -1,0 +1,610 @@
+/* ==========================================================================
+   PKL Hub - Dashboard Style (sangat mendekati referensi visual)
+   Diperbaiki: tombol Terima/Tolak rapi, jarak bagus, horizontal
+   ========================================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+  line-height: 1.5;
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+  color: white;
+  padding: 20px 16px;
+  overflow-y: auto;
+  box-shadow: 3px 0 15px rgba(0,0,0,0.25);
+  z-index: 1000;
+}
+
+.sidebar-logo {
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  color: rgba(255,255,255,0.9);
+  text-decoration: none;
+  padding: 12px 16px;
+  margin: 6px 0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.sidebar a i {
+  font-size: 20px;
+  margin-right: 14px;
+  width: 24px;
+  text-align: center;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background: rgba(255,255,255,0.18);
+  color: white;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  margin-left: 260px;
+  padding: 24px 32px;
+  min-height: 100vh;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  color: #0f172a;
+}
+
+.btn-add {
+  background: #3b82f6;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.25);
+}
+
+.btn-add:hover {
+  background: #2563eb;
+}
+
+/* STATISTIK CARDS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  position: relative;
+  border-radius: 10px;
+  padding: 24px 20px;
+  color: white;
+  overflow: hidden;
+  min-height: 130px;
+}
+
+.stat-card .stat-icon {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 5.5rem;
+  opacity: 0.12;
+}
+
+.stat-card h2 {
+  font-size: 3.8rem;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+  line-height: 0.9;
+}
+
+.stat-card p {
+  font-size: 1.05rem;
+  margin: 0;
+  opacity: 0.88;
+}
+
+.stat-card.total     { background: #3b82f6; }
+.stat-card.diterima  { background: #22c55e; }
+.stat-card.ditolak   { background: #ef4444; }
+.stat-card.menunggu  { background: #f59e0b; }
+
+.progress-bar-container {
+  height: 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: rgba(255,255,255,0.75);
+  border-radius: 2px;
+}
+
+/* CHART */
+.chart-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  margin-bottom: 32px;
+}
+
+.chart-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.weekly-bars {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  height: 340px;
+  padding: 0 12px;
+}
+
+.bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-align: center;
+}
+
+.bars {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 20px 12px 0;
+}
+
+.bar-item {
+  width: 50px;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+}
+
+.bar-item span {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 600;
+  font-size: 14px;
+  color: #475569;
+}
+
+.bar-item.diterima  { background: #22c55e; }
+.bar-item.ditolak   { background: #ef4444; }
+.bar-item.menunggu  { background: #f59e0b; }
+
+.bar-label {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.bar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* TABEL SISWA PELAMAR */
+.recent-table {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+
+.recent-table .card-header {
+  background: #0f172a;
+  color: white;
+  padding: 12px 16px;
+  font-size: 17px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recent-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recent-table th {
+  background: #111827;
+  color: white;
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+}
+
+.recent-table td {
+  padding: 14px 16px;
+  vertical-align: middle;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Perbaikan tombol Terima & Tolak */
+.recent-table .action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.recent-table .btn-sm {
+  padding: 6px 14px;
+  font-size: 13px;
+  line-height: 1.4;
+  border-radius: 6px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.recent-table .btn-success {
+  background-color: #22c55e;
+  border-color: #22c55e;
+  color: white;
+}
+
+.recent-table .btn-success:hover:not(.disabled) {
+  background-color: #16a34a;
+  border-color: #16a34a;
+}
+
+.recent-table .btn-danger {
+  background-color: #ef4444;
+  border-color: #ef4444;
+  color: white;
+}
+
+.recent-table .btn-danger:hover:not(.disabled) {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+.recent-table .btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Avatar kecil */
+.avatar-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+/* Card footer */
+.card-footer {
+  background: #f8fafc;
+  padding: 14px;
+  text-align: center;
+  border-top: 1px solid #e5e7eb;
+}
+
+.card-footer a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .sidebar { width: 220px; }
+  .main-content { margin-left: 220px; padding: 20px; }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 16px;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .recent-table .action-buttons {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .recent-table .btn-sm {
+    flex: 1;
+    min-width: 90px;
+  }
+}
+
+/* ==========================================================================
+   PKL Hub - Style untuk Lowongan PKL (sama seperti referensi gambar)
+   ========================================================================== */
+
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+  }
+  
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+    color: white;
+    padding: 20px 16px;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+  
+  .sidebar-logo {
+    font-size: 28px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .sidebar a {
+    display: flex;
+    align-items: center;
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    padding: 12px 16px;
+    margin: 6px 0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .sidebar a i {
+    font-size: 20px;
+    margin-right: 14px;
+    width: 24px;
+    text-align: center;
+  }
+  
+  .sidebar a:hover,
+  .sidebar a.active {
+    background: rgba(255,255,255,0.18);
+  }
+  
+  /* MAIN CONTENT */
+  .main-content {
+    margin-left: 260px;
+    padding: 24px 32px;
+    min-height: 100vh;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+  
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  .btn-add {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* STATISTIK CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  
+  .stat-card {
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    min-height: 130px;
+  }
+  
+  .stat-card .stat-icon {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 4.5rem;
+    opacity: 0.15;
+  }
+  
+  .stat-card h2 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin: 0 0 4px;
+  }
+  
+  .stat-card p {
+    font-size: 1.05rem;
+    margin: 0;
+    opacity: 0.9;
+  }
+  
+  .stat-card.aktif     { background: #3b82f6; }
+  .stat-card.terpasang { background: #22c55e; }
+  .stat-card.berakhir  { background: #ef4444; }
+  .stat-card.pelamar   { background: #f59e0b; }
+  
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  
+  .filter-bar .form-control,
+  .filter-bar .form-select {
+    border-radius: 8px;
+  }
+  
+  /* LOWONGAN CARD */
+  .lowongan-list .lowongan-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.2s;
+  }
+  
+  .lowongan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+  
+  .lowongan-icon {
+    font-size: 48px;
+    color: #3b82f6;
+    width: 70px;
+    text-align: center;
+  }
+  
+  .lowongan-info h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+  
+  .lowongan-info p {
+    margin: 0 0 8px;
+    color: #64748b;
+    font-size: 14px;
+  }
+  
+  .lowongan-info .meta {
+    font-size: 13px;
+    color: #6b7280;
+  }
+  
+  .status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: auto;
+  }
+  
+  .badge-success { background: #dcfce7; color: #166534; }
+  .badge-warning { background: #fef3c7; color: #92400e; }
+  .badge-danger  { background: #fee2e2; color: #991b1b; }
+  
+  .lowongan-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 16px;
+  }
+  
+  .lowongan-actions .btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  /* MODAL */
+  .modal-content {
+    border-radius: 12px;
+  }
+  
+  .modal-header {
+    background: #1e40af;
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
